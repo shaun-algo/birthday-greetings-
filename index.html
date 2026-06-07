@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy 20th Birthday Alyssa</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --rose:#e8748a;--rose-soft:#f5c6d2;--rose-pale:#fdf0f3;
+  --rose-mid:#fbdce5;--ink:#1c1014;--ink-muted:#6b4a54;
+  --white:#ffffff;--cream:#fefbfc;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);overflow-x:hidden}
+
+.bar{position:fixed;top:0;left:0;height:2px;background:var(--rose);z-index:9999;width:0;transition:width .1s linear;pointer-events:none}
+
+/* TULIP CANVAS */
+#tulip-canvas{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0;transition:opacity 1s ease}
+#tulip-canvas.visible{opacity:1}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;background:rgba(254,251,252,.88);backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:.3s}
+nav.scrolled{border-color:rgba(232,116,138,.15)}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;letter-spacing:2px;color:var(--rose)}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{text-decoration:none;font-size:.8rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-muted);transition:.2s}
+.nav-links a:hover{color:var(--rose)}
+
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:100px 24px 60px;position:relative;overflow:hidden;z-index:3}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(245,198,210,.28) 0%,transparent 70%);pointer-events:none}
+.hero-eyebrow{font-size:.75rem;letter-spacing:4px;text-transform:uppercase;color:var(--rose);margin-bottom:28px;opacity:.9}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(5rem,14vw,9rem);line-height:.88;font-weight:400;margin-bottom:32px;color:var(--ink)}
+.hero h1 em{font-style:italic;color:var(--rose)}
+.hero-tagline{font-size:.85rem;letter-spacing:3px;text-transform:uppercase;color:var(--ink-muted);margin-bottom:56px}
+.hero-divider{width:40px;height:1px;background:var(--rose-soft);margin:0 auto 32px}
+.scroll-hint{font-size:.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-muted);opacity:.6;animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:.9}}
+
+main{position:relative;z-index:10}
+section{padding:100px 24px}
+.container{max-width:960px;margin:0 auto}
+.section-label{font-size:.7rem;letter-spacing:4px;text-transform:uppercase;color:var(--rose);margin-bottom:16px}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5vw,3.6rem);font-weight:400;margin-bottom:56px;color:var(--ink)}
+
+#letter{background:var(--cream)}
+.letter-wrap{display:grid;grid-template-columns:1fr 2fr;gap:60px;align-items:start}
+.letter-meta{position:sticky;top:120px}
+.letter-meta .date{font-size:.8rem;color:var(--ink-muted);margin-bottom:12px}
+.letter-deco{width:1px;height:80px;background:linear-gradient(to bottom,var(--rose-soft),transparent);margin:24px 0}
+.letter-from{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-style:italic;color:var(--rose)}
+.letter-body p{line-height:2;margin-bottom:24px;color:var(--ink-muted);font-size:1.05rem}
+.letter-body p:last-child{margin-bottom:0}
+.letter-body .signature{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-style:italic;color:var(--ink)}
+
+#gallery{background:var(--rose-pale)}
+.gallery-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.photo{overflow:hidden;border-radius:4px;background:var(--white)}
+.photo.tall{grid-row:span 2}
+.photo img{width:100%;height:100%;object-fit:cover;display:block;transition:.6s ease}
+.photo:hover img{transform:scale(1.04)}
+.photo-tall-inner{aspect-ratio:3/4}
+.photo-sq{aspect-ratio:1/1}
+.photo.portrait{grid-row:span 1}
+.photo-portrait{aspect-ratio:3/4}
+.photo-caption{padding:12px 16px;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--ink-muted)}
+
+#video{background:var(--cream)}
+.video-wrap{border-radius:4px;overflow:hidden;background:var(--ink);aspect-ratio:16/9;position:relative}
+.video-wrap video{width:100%;height:100%;display:block}
+.video-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(28,16,20,.6);transition:.3s}
+.play-btn{width:64px;height:64px;border:1.5px solid rgba(255,255,255,.6);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.3s}
+.play-btn:hover{background:rgba(255,255,255,.1);transform:scale(1.08)}
+.play-btn svg{width:22px;height:22px;fill:white;margin-left:4px}
+
+#wishes{background:var(--rose-pale)}
+.wishes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;border:1px solid var(--rose-soft);background:var(--rose-soft)}
+.wish{background:var(--rose-pale);padding:40px 32px}
+.wish-num{font-family:'Cormorant Garamond',serif;font-size:3rem;color:var(--rose-soft);line-height:1;margin-bottom:16px;font-weight:600}
+.wish h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;margin-bottom:12px;color:var(--ink)}
+.wish p{font-size:.9rem;line-height:1.8;color:var(--ink-muted)}
+
+.final{min-height:80vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 24px;background:var(--ink)}
+.final-inner{max-width:640px}
+.final-eyebrow{font-size:.7rem;letter-spacing:4px;text-transform:uppercase;color:var(--rose);margin-bottom:32px}
+.final h2{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,7vw,5rem);font-weight:400;color:var(--white);line-height:1;margin-bottom:32px}
+.final h2 em{color:var(--rose-soft);font-style:italic}
+.final p{color:rgba(255,255,255,.5);font-size:.95rem;line-height:2;max-width:480px;margin:0 auto 16px}
+.final-sig{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-style:italic;color:var(--rose-soft);margin-top:40px}
+.final-line{width:40px;height:1px;background:rgba(232,116,138,.3);margin:32px auto}
+
+/* BACK TO TOP */
+#btt{
+  position:fixed;bottom:32px;right:32px;z-index:999;
+  width:44px;height:44px;border-radius:50%;
+  background:var(--rose);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:translateY(12px);
+  transition:opacity .35s ease,transform .35s ease,background .2s;
+  pointer-events:none;
+  box-shadow:0 4px 20px rgba(232,116,138,.35);
+}
+#btt.show{opacity:1;transform:translateY(0);pointer-events:auto}
+#btt:hover{background:#d45e76}
+#btt svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* MUSIC BUTTON */
+#music-btn{
+  position:fixed;bottom:86px;right:32px;z-index:999;
+  width:44px;height:44px;border-radius:50%;
+  background:var(--rose);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:1;
+  transition:background .2s,transform .2s;
+  box-shadow:0 4px 20px rgba(232,116,138,.35);
+}
+#music-btn:hover{background:#d45e76;transform:scale(1.08)}
+#music-btn svg{width:20px;height:20px;fill:white;transition:.2s}
+#music-btn .note-icon{display:flex}
+#music-btn .mute-icon{display:none}
+#music-btn.muted .note-icon{display:none}
+#music-btn.muted .mute-icon{display:flex}
+/* pulse ring when playing */
+#music-btn::before{
+  content:'';position:absolute;inset:-4px;border-radius:50%;
+  border:1.5px solid rgba(232,116,138,.5);
+  animation:music-ring 2s ease-in-out infinite;
+}
+#music-btn.muted::before{animation:none;opacity:0}
+@keyframes music-ring{
+  0%,100%{transform:scale(1);opacity:.6}
+  50%{transform:scale(1.18);opacity:0}
+}
+@media(max-width:680px){
+  #music-btn{bottom:74px;right:20px}
+}
+
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:none}
+
+@media(max-width:680px){
+  .letter-wrap{grid-template-columns:1fr}
+  .letter-meta{position:relative;top:auto}
+  nav{padding:16px 20px}
+  .nav-links{gap:16px}
+  .gallery-grid{grid-template-columns:1fr;gap:12px}
+  .photo.tall{grid-row:span 1}
+  .wishes-grid{grid-template-columns:1fr}
+  #btt{bottom:20px;right:20px}
+}
+</style>
+</head>
+<body>
+
+<div class="bar" id="bar"></div>
+<canvas id="tulip-canvas"></canvas>
+
+<nav id="nav">
+  <div class="nav-logo">ALYSSA</div>
+  <ul class="nav-links">
+    <li><a href="#letter">Letter</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#wishes">Wishes</a></li>
+  </ul>
+</nav>
+
+<header class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div style="position:relative;z-index:3">
+    <div class="hero-eyebrow">June 8, 2026</div>
+    <h1>Happy<br><em>20th</em><br>Birthday</h1>
+    <div class="hero-tagline">Alyssa</div>
+    <div class="hero-divider"></div>
+    <div class="scroll-hint">Scroll to explore ↓</div>
+  </div>
+</header>
+
+<main>
+  <section id="letter" class="reveal">
+    <div class="container">
+      <div class="letter-wrap">
+        <div class="letter-meta">
+          <div class="section-label">Letter</div>
+          <div class="section-title" style="margin-bottom:0;font-size:2.2rem">For<br>Alyssa</div>
+          <div class="letter-deco"></div>
+          <div class="date">June 8, 2026</div>
+          <div class="letter-from">From Shaun The Sheep</div>
+        </div>
+        <div class="letter-body">
+          <p>Hi Alyssa,</p>
+          <p>Taray naman may pa special web greetengks, Oks lang deserve mo itu!!</p>
+
+<p>Thank you sa lahat ng tawanan, kalokohan, tea sessions, life updates, random rants, at mga "TANGINA MO BEHH, SHAUNNN" moments. Hindi kumpleto ang araw kapag walang bagong kwento sa R. at marami pang iba👉🏻👌🏻 </p>
+
+<p>thenkss din pagspoil sakin ng Hot Wheels at iba pang gifts. Certified tita sa malayong dapit</p>
+
+<p>Sana this year brings you more happiness, opportunities, successful era, muchie pera, at stress. Manifesting na ma-achieve mo lahat ng goals mo habang cute pa rin ako. </p>
+
+<p>Enjoy your special day! Thank you for being an amazing friend and sa pag (stay ko) through all the drama, tea, and rnel. Cheers, more kaldagan, and more years of sapakan!</p>
+          <p class="signature">Happy Birthday, best sis.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery" class="reveal">
+    <div class="container">
+      <div class="section-label">Gallery</div>
+      <div class="section-title">Facebook<br>Reel</div>
+      <div class="gallery-grid">
+        <div class="photo tall">
+          <div class="photo-tall-inner"><img src="img/rnel.jpg" alt="Memory 1"></div>
+          <div class="photo-caption">Delul0 momento</div>
+        </div>
+        <div class="photo portrait">
+  <div class="photo-portrait">
+    <img src="img/alyssa.jpg" alt="Memory 2">
+  </div>
+  <div class="photo-caption">Tounge showcase</div>
+</div>
+
+<div class="photo portrait">
+  <div class="photo-portrait">
+    <img src="img/alyssa02.jpg" alt="Memory 3">
+  </div>
+  <div class="photo-caption">A moment of peace - v.20</div>
+</div>
+        <div class="photo" style="grid-column:1/-1">
+          <div style="aspect-ratio:16/9;min-height:320px"><img src="img/us.png" alt="Memory 4" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div class="photo-caption">Super Saiyan 10000x</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="video" class="reveal">
+    <div class="container">
+      <div class="section-label">Vid</div>
+      <div class="section-title">A Video<br>Just for You</div>
+      <div class="video-wrap">
+        <video id="vid" preload="metadata">
+          <source src="video/rider.mp4" type="video/mp4">
+        </video>
+        <div class="video-overlay" id="overlay">
+          <div class="play-btn" id="playBtn">
+            <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="wishes" class="reveal">
+    <div class="container">
+      <div class="section-label">Wishes</div>
+      <div class="section-title">For Your<br>Next Chapter</div>
+     <div class="wishes-grid">
+
+  <div class="wish">
+    <div class="wish-num">01</div>
+    <h3>KALDAGAN</h3>
+    <p>May your days be filled with happiness, and laughter</p>
+  </div>
+
+  <div class="wish">
+    <div class="wish-num">02</div>
+    <h3>BIG WINSSS</h3>
+    <p>May every step you take bring you closer to your goals and the future you have been working hard for.</p>
+  </div>
+
+  <div class="wish">
+    <div class="wish-num">03</div>
+    <h3>MORE GANAPS</h3>
+    <p>May this year bring opportunities, memorable experiences, and stories worth sharing.</p>
+  </div>
+
+  <div class="wish">
+    <div class="wish-num">04</div>
+    <h3>FREINDSHIPS </h3>
+    <p>May you continue to be surrounded by genuine friendships, positive energy, and people who bring out the best in you.</p>
+  </div>
+
+</div>
+    </div>
+  </section>
+
+  <footer class="final">
+    <div class="final-inner">
+      <div class="final-eyebrow">Twenty years of you</div>
+      <h2>Keep being<br><em>amazing,</em><br>Alyssa</h2>
+      <div class="final-line"></div>
+      <p>Keep killing, keep growing, and keep being exactly who you are.</p>
+      <div class="final-sig">Happy 20th Birthday </div>
+    </div>
+  </footer>
+</main>
+
+<!-- MUSIC BUTTON -->
+<button id="music-btn" aria-label="Toggle music">
+  <span class="note-icon">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9 18V5l12-2v13" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="6" cy="18" r="3" fill="white"/>
+      <circle cx="18" cy="16" r="3" fill="white"/>
+    </svg>
+  </span>
+  <span class="mute-icon">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9 18V5l12-2v13" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="6" cy="18" r="3" fill="white"/>
+      <circle cx="18" cy="16" r="3" fill="white"/>
+      <line x1="2" y1="2" x2="22" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </span>
+</button>
+
+<!-- Replace src with your actual music file path -->
+<audio id="bg-music" loop>
+  <source src="audio/hey_there.mp3" type="audio/mpeg">
+</audio>
+
+<button id="btt" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+/* ── PROGRESS BAR ── */
+const bar = document.getElementById('bar');
+const nav = document.getElementById('nav');
+const btt = document.getElementById('btt');
+
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  bar.style.width = pct + '%';
+  nav.classList.toggle('scrolled', h.scrollTop > 60);
+  btt.classList.toggle('show', h.scrollTop > 400);
+
+  const heroH = document.getElementById('hero').offsetHeight;
+  const inHero = h.scrollTop < heroH * 0.85;
+  tulipCanvas.style.opacity = inHero ? '1' : '0';
+});
+
+/* ── TULIP CANVAS ── */
+const tulipCanvas = document.getElementById('tulip-canvas');
+const ctx = tulipCanvas.getContext('2d');
+
+function resize() {
+  tulipCanvas.width = window.innerWidth;
+  tulipCanvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+setTimeout(() => tulipCanvas.classList.add('visible'), 600);
+
+const TULIP_COUNT = 11;
+const tulips = [];
+
+function makeTulip() {
+  const x = Math.random() * window.innerWidth;
+  const startY = window.innerHeight + 120;
+  const speed = 0.4 + Math.random() * 0.6;
+  const scale = 0.55 + Math.random() * 0.65;
+  const sway = (Math.random() - 0.5) * 1.2;
+  const swayFreq = 0.008 + Math.random() * 0.006;
+  const swayAmp = 18 + Math.random() * 22;
+  const hue = 330 + Math.random() * 40;
+  const delay = Math.random() * 400;
+  return { x, y: startY + delay * speed, baseX: x, speed, scale, sway, swayFreq, swayAmp, hue, t: 0, opacity: 0 };
+}
+
+for (let i = 0; i < TULIP_COUNT; i++) {
+  const t = makeTulip();
+  t.y = window.innerHeight * Math.random();
+  tulips.push(t);
+}
+
+function drawTulip(cx, cy, scale, hue, opacity) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
+  ctx.globalAlpha = opacity;
+
+  const stemColor = '#5a8a4a';
+  const petalMain = `hsl(${hue},80%,68%)`;
+  const petalDark = `hsl(${hue},75%,52%)`;
+  const petalLight = `hsl(${hue},70%,84%)`;
+
+  /* stem */
+  ctx.strokeStyle = stemColor;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.bezierCurveTo(-4, -28, 2, -52, 0, -72);
+  ctx.stroke();
+
+  /* leaf left */
+  ctx.fillStyle = stemColor;
+  ctx.beginPath();
+  ctx.moveTo(-2, -38);
+  ctx.bezierCurveTo(-18, -44, -30, -36, -22, -28);
+  ctx.bezierCurveTo(-14, -20, -4, -30, -2, -38);
+  ctx.fill();
+
+  /* leaf right */
+  ctx.beginPath();
+  ctx.moveTo(2, -50);
+  ctx.bezierCurveTo(18, -56, 28, -44, 18, -38);
+  ctx.bezierCurveTo(10, -32, 4, -42, 2, -50);
+  ctx.fill();
+
+  /* petals back */
+  ctx.fillStyle = petalDark;
+  ctx.beginPath();
+  ctx.moveTo(0, -72);
+  ctx.bezierCurveTo(-14, -80, -18, -100, -8, -112);
+  ctx.bezierCurveTo(-2, -118, 4, -110, 0, -72);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(0, -72);
+  ctx.bezierCurveTo(14, -80, 18, -100, 8, -112);
+  ctx.bezierCurveTo(2, -118, -4, -110, 0, -72);
+  ctx.fill();
+
+  /* petals mid */
+  ctx.fillStyle = petalMain;
+  ctx.beginPath();
+  ctx.moveTo(0, -72);
+  ctx.bezierCurveTo(-20, -76, -26, -98, -14, -114);
+  ctx.bezierCurveTo(-8, -122, 0, -116, 0, -72);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(0, -72);
+  ctx.bezierCurveTo(20, -76, 26, -98, 14, -114);
+  ctx.bezierCurveTo(8, -122, 0, -116, 0, -72);
+  ctx.fill();
+
+  /* center petal */
+  ctx.fillStyle = petalLight;
+  ctx.beginPath();
+  ctx.moveTo(0, -72);
+  ctx.bezierCurveTo(-10, -82, -10, -106, 0, -118);
+  ctx.bezierCurveTo(10, -106, 10, -82, 0, -72);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+let lastTime = 0;
+function animateTulips(ts) {
+  const dt = Math.min(ts - lastTime, 32);
+  lastTime = ts;
+  ctx.clearRect(0, 0, tulipCanvas.width, tulipCanvas.height);
+
+  tulips.forEach(t => {
+    t.t += dt * 0.001;
+    t.y -= t.speed * (dt / 16);
+    t.x = t.baseX + Math.sin(t.t * t.swayFreq * 80) * t.swayAmp;
+
+    if (t.y < -140) {
+      t.baseX = Math.random() * window.innerWidth;
+      t.x = t.baseX;
+      t.y = window.innerHeight + 120;
+      t.opacity = 0;
+    }
+
+    const fromBottom = window.innerHeight - t.y;
+    if (fromBottom < 200) t.opacity = Math.min(1, fromBottom / 200);
+    else if (t.y < 200) t.opacity = Math.max(0, t.y / 200);
+    else t.opacity = 1;
+
+    drawTulip(t.x, t.y, t.scale, t.hue, t.opacity * 0.82);
+  });
+
+  requestAnimationFrame(animateTulips);
+}
+requestAnimationFrame(ts => { lastTime = ts; animateTulips(ts); });
+
+/* ── CONFETTI BOMB on load ── */
+function launchConfetti() {
+  const colors = ['#e8748a','#f5c6d2','#fbdce5','#fdf0f3','#d4537e','#ffffff','#ffeef3'];
+  const duration = 3200;
+  const end = Date.now() + duration;
+
+  const burst = (x, y, spread) => confetti({
+    particleCount: 90,
+    angle: 90,
+    spread,
+    origin: { x, y },
+    colors,
+    gravity: 0.9,
+    scalar: 1.1,
+    ticks: 200,
+    shapes: ['circle','square'],
+    zIndex: 9999
+  });
+
+  burst(0.5, 0.55, 140);
+  setTimeout(() => burst(0.2, 0.6, 80), 180);
+  setTimeout(() => burst(0.8, 0.6, 80), 260);
+  setTimeout(() => burst(0.5, 0.5, 160), 500);
+  setTimeout(() => burst(0.35, 0.55, 70), 700);
+  setTimeout(() => burst(0.65, 0.55, 70), 820);
+
+  const interval = setInterval(() => {
+    if (Date.now() > end) { clearInterval(interval); return; }
+    confetti({
+      particleCount: 12,
+      angle: 60 + Math.random() * 60,
+      spread: 55,
+      origin: { x: Math.random(), y: 0.5 + Math.random() * 0.2 },
+      colors,
+      gravity: 1,
+      scalar: 0.9,
+      ticks: 160,
+      zIndex: 9999
+    });
+  }, 90);
+}
+
+window.addEventListener('load', () => {
+  setTimeout(launchConfetti, 400);
+});
+
+/* ── REVEAL ── */
+const revEls = document.querySelectorAll('.reveal');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: .1 });
+revEls.forEach(el => obs.observe(el));
+
+/* ── VIDEO ── */
+const vid = document.getElementById('vid');
+const overlay = document.getElementById('overlay');
+document.getElementById('playBtn').addEventListener('click', () => {
+  vid.play();
+  overlay.style.opacity = '0';
+  overlay.style.pointerEvents = 'none';
+});
+vid.addEventListener('click', () => {
+  if (vid.paused) { vid.play(); overlay.style.opacity='0'; overlay.style.pointerEvents='none'; }
+  else { vid.pause(); overlay.style.opacity='1'; overlay.style.pointerEvents='auto'; }
+});
+
+/* ── BACKGROUND MUSIC ── */
+const bgMusic = document.getElementById('bg-music');
+const musicBtn = document.getElementById('music-btn');
+let musicStarted = false;
+
+bgMusic.volume = 0.45;
+
+function startMusic() {
+  bgMusic.play().then(() => {
+    musicStarted = true;
+    musicBtn.classList.remove('muted');
+  }).catch(() => {
+    // Autoplay blocked — button still works on first user tap
+    musicBtn.classList.add('muted');
+  });
+}
+
+// Try autoplay on load
+window.addEventListener('load', () => {
+  setTimeout(startMusic, 800);
+});
+
+// Fallback: start on first user interaction if autoplay was blocked
+function handleFirstInteraction() {
+  if (!musicStarted) {
+    startMusic();
+    document.removeEventListener('click', handleFirstInteraction);
+    document.removeEventListener('touchstart', handleFirstInteraction);
+    document.removeEventListener('scroll', handleFirstInteraction);
+  }
+}
+document.addEventListener('click', handleFirstInteraction);
+document.addEventListener('touchstart', handleFirstInteraction);
+document.addEventListener('scroll', handleFirstInteraction, { passive: true });
+
+// Toggle button
+musicBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (bgMusic.paused) {
+    bgMusic.play();
+    musicBtn.classList.remove('muted');
+  } else {
+    bgMusic.pause();
+    musicBtn.classList.add('muted');
+  }
+});
+</script>
+</body>
+</html>
